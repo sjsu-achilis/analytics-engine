@@ -34,5 +34,7 @@ RUN apt-get update -y && \
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+EXPOSE 8080
+
 # add entrypoint
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:8080", "/app/core/wsgi"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:8080", "core.wsgi", "2>&1", "|", "tee", "-a", "/logs/core.log"]
