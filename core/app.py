@@ -23,22 +23,26 @@ def verify():
     log.info('service health')
     return 'service is up'
 
-@application.route('/get_hydration', methods=['GET'])
-def get_hydration(*args, **kwargs):
+
+@application.route('/get_metric', methods=['GET'])
+def get_metric(*args, **kwargs):
     '''
-    userid, start_timestamp, end_timestamp
+    userid, start_timestamp, end_timestamp, metric_label
     '''
     pretty_print_POST(request)
     args = request.args.to_dict()
     send_data = {
       u"values": []
       }
-    statement = query.get_hydration.format \
-             (str(args['userid']),args['start_timestamp'],args['end_timestamp'])
-    log.info('get_hydration called with query {}'.format(statement))
+
+    statement = query.get_metric.format(str(args['userid']),args\
+                ['metric_label'],args['start_timestamp'],args['end_timestamp'])
+
+    log.info('query:  {}'.format(statement))
     result = db_fetch(statement)
+    log.info(result)
     for res in result:
-        temp = templates.get_hydration
+        temp = templates.get_metric.copy()
         if res[0]:
             temp["event_timestamp"] = str(res[0])
         if res[1]:
@@ -47,6 +51,36 @@ def get_hydration(*args, **kwargs):
     log.info("sent response \n{}".format(pprint.pformat(send_data)))
 
     return Response(json.dumps(send_data), status=200, mimetype='application/json')
+
+
+@application.route('/get_max_metric', methods=['GET'])
+def get_max_metric(*args, **kwargs):
+    '''
+    userid, start_timestamp, end_timestamp, metric_label
+    '''
+    pretty_print_POST(request)
+    args = request.args.to_dict()
+    send_data = {
+      u"values": []
+      }
+
+    statement = query.get_max_metric.format(str(args['userid']),args\
+                ['metric_label'],args['start_timestamp'],args['end_timestamp'])
+
+    log.info('query:  {}'.format(statement))
+    result = db_fetch(statement)
+    log.info(result)
+    for res in result:
+        temp = templates.get_max_metric.copy()
+        if res[0]:
+            temp["event_timestamp"] = str(res[0])
+        if res[1]:
+            temp["max_metric_value"] = str(res[1])
+        send_data["values"].append(temp)
+    log.info("sent response \n{}".format(pprint.pformat(send_data)))
+
+    return Response(json.dumps(send_data), status=200, mimetype='application/json')
+
 
 
 def pretty_print_POST(req):

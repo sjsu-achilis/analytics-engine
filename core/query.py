@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
-get_hydration = "select event_timestamp, metric_value from \
-health_metrics where userid='{}' and metric_label='hydration' \
+get_metric = "select event_timestamp, metric_value from \
+health_metrics where userid='{}' and metric_label='{}' \
 and event_timestamp::date between '{}' and '{}'"
+
+get_max_metric = "select event_timestamp, max(metric_value) from \
+health_metrics where userid='{}' and metric_label='{}' \
+and event_timestamp::date between '{}' and '{}' group by event_timestamp"
