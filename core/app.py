@@ -31,13 +31,13 @@ def get_metric(*args, **kwargs):
     '''
     pretty_print_POST(request)
     args = request.args.to_dict()
-    send_data = {
-      u"values": []
-      }
-
     statement = query.get_metric.format(str(args['userid']),args\
                 ['metric_label'],args['start_timestamp'],args['end_timestamp'])
 
+    send_data = {
+      u"label": args['metric_label'],
+      u"values": []
+      }
     log.info('query:  {}'.format(statement))
     result = db_fetch(statement)
     log.info(result)
@@ -60,13 +60,13 @@ def get_max_metric(*args, **kwargs):
     '''
     pretty_print_POST(request)
     args = request.args.to_dict()
-    send_data = {
-      u"values": []
-      }
-
     statement = query.get_max_metric.format(str(args['userid']),args\
                 ['metric_label'],args['start_timestamp'],args['end_timestamp'])
 
+    send_data = {
+      u"label": args['metric_label'],
+      u"values": []
+      }
     log.info('query:  {}'.format(statement))
     result = db_fetch(statement)
     log.info(result)
