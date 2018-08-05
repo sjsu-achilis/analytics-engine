@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # build docker image
-docker build -t synthetic .
+docker build -t achcore .
 
 # tag with repo
-docker tag core:latest pankajchandan/core:latest
+docker tag core:latest pankajchandan/achcore:latest
 
 # do docker login here if pushing to remote registry
 docker login
 
 # push here
-docker push pankajchandan/core:latest
+docker push pankajchandan/achcore:latest

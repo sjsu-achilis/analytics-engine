@@ -1,7 +1,7 @@
 FROM python:2.7-slim
 
 ENV PYTHONPATH /app
-ENV LOG_CONFIG flask
+ENV LOG_CONFIG default
 ENV LOG_BASE /
 ENV TZ=America/Los_Angeles
 
@@ -23,12 +23,8 @@ RUN apt-get update -y && \
     curl \
     wget \
     iputils-ping \
-    dnsutils \
     net-tools \
-    iproute \
-    iptables \
-    traceroute \
-    tcpdump
+    git-core
 
 # install pip reqs
 RUN pip install --upgrade pip && \
@@ -37,4 +33,5 @@ RUN pip install --upgrade pip && \
 EXPOSE 8080
 
 # add entrypoint
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:8080", "core.wsgi", "2>&1", "|", "tee", "-a", "/logs/core.log"]
+ENTRYPOINT ["/bin/bash"]
+CMD ["./core/run_prog.sh"]
