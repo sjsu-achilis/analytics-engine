@@ -1,2 +1,2 @@
-# analytics-engine
-This repository contains code and documentation for the analytics engine.
+# core
+This repository contains code and documentation for the analytics engine, and all the web services.
