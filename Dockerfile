@@ -30,7 +30,7 @@ RUN apt-get update -y && \
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 80
 
 # add entrypoint
 ENTRYPOINT ["/bin/bash"]
