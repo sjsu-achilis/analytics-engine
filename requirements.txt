@@ -9,3 +9,4 @@ psycopg2==2.7.5
 Werkzeug==0.14.1
 requests
 pprint
+flask_cors
