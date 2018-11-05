@@ -47,7 +47,7 @@ def get_metric(*args, **kwargs):
     '''
     userid, start_timestamp, end_timestamp, metric_label
     '''
-    pretty_print_POST(request)
+    log.info("/get_metric")
     args = request.args.to_dict()
     statement = query.get_metric.format(str(args['userid']),args\
                 ['metric_label'],args['start_timestamp'],args['end_timestamp'])
@@ -76,7 +76,7 @@ def get_max_metric(*args, **kwargs):
     '''
     userid, start_timestamp, end_timestamp, metric_label
     '''
-    pretty_print_POST(request)
+    log.info("/get_max_metric")
     args = request.args.to_dict()
     statement = query.get_max_metric.format(str(args['userid']),args\
                 ['metric_label'],args['start_timestamp'],args['end_timestamp'])
@@ -102,6 +102,7 @@ def get_max_metric(*args, **kwargs):
 
 @application.route('/get_questions', methods=['GET'])
 def get_questions():
+    log.info("/get_questions")
     statement = query.get_questions
     result = db_fetch(statement)
     send_data = []
@@ -113,19 +114,16 @@ def get_questions():
 
 @application.route('/save_response', methods=['OPTIONS','POST'])
 def save_response():
+    log.info("/save_response")
     response = request.json
     uid = response["user_id"]
     val = ""
     for a in response["answers"]:
         val += ",('{}','{}',{},'{}')".format(uid,a["qid"],a["ans"],str(datetime.datetime.now()).split('.')[0])
-    print query.save_response_ins.format(val[1:])
+    log.info("query: {}".format(query.save_response_ins.format(val[1:])))
     ok = db_insup(query.save_response_ins.format(val[1:]))
-    if ok:
-        token = "ok"
-    else:
-        token = "Error saving"
-
-    return Response(json.dumps({"msg": token}), headers=HEADER, status=200, mimetype='application/json')
+    
+    return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
 
 
 if __name__ == '__main__':
