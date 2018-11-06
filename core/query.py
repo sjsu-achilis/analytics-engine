@@ -10,3 +10,5 @@ and event_timestamp::date between '{}' and '{}' group by event_timestamp"
 get_questions = "select * from questionnaire"
 
 save_response_ins = "insert into questionnaire_response values {}"
+
+edit_qstn_response = "update questionnaire_response set response={} where userid='{}' and qid='{}'"

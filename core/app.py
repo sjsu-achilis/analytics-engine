@@ -122,8 +122,24 @@ def save_response():
         val += ",('{}','{}',{},'{}')".format(uid,a["qid"],a["ans"],str(datetime.datetime.now()).split('.')[0])
     log.info("query: {}".format(query.save_response_ins.format(val[1:])))
     ok = db_insup(query.save_response_ins.format(val[1:]))
-    
+
     return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/edit_qstn_response', methods=['OPTIONS','POST'])
+def edit_qstn_response():
+    log.info("/edit_qstn_response")
+    response = request.json
+    uid = response["user_id"]
+    send_response = []
+    for a in response["answers"]:
+        statement = query.edit_qstn_response.format(a["ans"],uid,a["qid"])
+        log.info("query: {}".format(statement))
+        ok = db_insup(statement)
+        send_response.append({"qid": a["qid"],"success":ok})
+
+    return Response(json.dumps(send_response), headers=HEADER, status=200, mimetype='application/json')
+
 
 
 if __name__ == '__main__':
