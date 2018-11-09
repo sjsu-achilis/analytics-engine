@@ -112,6 +112,53 @@ def get_questions():
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/get_sports', methods=['GET'])
+def get_sports():
+    log.info('/get_sports')
+    statement = query.get_sports
+    result = db_fetch(statement)
+    send_data = []
+    for r in result:
+        send_data.append(collections.OrderedDict({u"s_id": r[0], u"s_nsme": r[1], u"s_type":r[2]}))
+
+    return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/is_uid_available', methods=['GET'])
+def is_uid_available():
+    log.info('/is_uid_available')
+    args = (request.args.to_dict()["userid"],)
+    statement = query.is_uid_available
+    result = set(db_fetch(statement))
+    send_data = {"avl": args not in result}
+
+    return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/register_user_info', methods=['OPTIONS','POST'])
+def register_user_info():
+    log.info("/register_user_info")
+    response = request.json
+    for_users_table_vals = "('{}','{}','{}','{}','{}')".format(response["name"],response["email"],response\
+                                                   ["userid"],response["role"],response["org"])
+    statement = query.register_user_info_1.format(for_users_table_vals)
+    log.info("query: {}".format(statement))
+    users_ins_ok = db_insup(statement)
+    user_inf_ins_ok = False
+    if users_ins_ok:
+        for_users_info_table_vals = "('{}',{},'{}',{},{},'{}')".format(response["userid"],response["age"],response["gender"],\
+                                                                    response["height"],response["weight"],response["s_id"])
+        statement = query.register_user_info_2.format(for_users_info_table_vals)
+        log.info("query: {}".format(statement))
+        user_inf_ins_ok = db_insup(statement)
+        if not user_inf_ins_ok:
+            statement = "delete from users where userid = '{}'".format(response["userid"])
+            ok = db_insup(statement)
+            log.info("deleted row: {}".format(ok))
+
+    return Response(json.dumps({"register": users_ins_ok and user_inf_ins_ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
 @application.route('/save_response', methods=['OPTIONS','POST'])
 def save_response():
     log.info("/save_response")
@@ -139,6 +186,8 @@ def edit_qstn_response():
         send_response.append({"qid": a["qid"],"success":ok})
 
     return Response(json.dumps(send_response), headers=HEADER, status=200, mimetype='application/json')
+
+
 
 
 
