@@ -10,3 +10,4 @@ Werkzeug==0.14.1
 requests
 pprint
 flask_cors
+firebase_admin
