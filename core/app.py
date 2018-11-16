@@ -191,6 +191,21 @@ def edit_qstn_response():
 
     return Response(json.dumps(send_response), headers=HEADER, status=200, mimetype='application/json')
 
+@application.route('/register_injury', methods=['OPTIONS','POST'])
+def register_injury():
+    log.info("/register_injury")
+    response = request.json
+    if response["date"]:
+        date = response["date"]
+    else:
+        date = str(datetime.datetime.now()).split('.')[0]
+    val = "('{}','{}','{}','{}','{}','{}')".format(response["userid"],response["desc"],\
+          date,response["type"],response["location"],response["region"])
+    statement = query.register_injury.format(val)
+    log.info("query: {}".format(statement))
+    ok = db_insup(statement)
+
+    return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
 
 @application.route('/get_injury_history', methods=['GET'])
 def get_injury_history():

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # build docker image
-docker build -t achcore .
+docker build --no-cache -t achcore .
 
 # tag with repo
 docker tag achcore:latest pankajchandan/achcore:latest

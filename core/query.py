@@ -26,3 +26,5 @@ get_injury_history = "select * from injury_history where userid='{}'"
 register_device_key = "update users set device_key='{}' where userid='{}'"
 
 get_device_key = "select device_key from users where userid='{}'"
+
+register_injury = "insert into injury_history values {}"
