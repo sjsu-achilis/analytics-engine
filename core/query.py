@@ -17,6 +17,12 @@ get_sports = "select * from sports"
 
 is_uid_available = "select userid from users"
 
-register_user_info_1 = "insert into users values {}"
+login_info = "insert into users values {}"
 
-register_user_info_2 = "insert into user_information values {}"
+register_user_info = "insert into user_information values {}"
+
+get_injury_history = "select * from injury_history where userid='{}'"
+
+register_device_key = "update users set device_key='{}' where userid='{}'"
+
+get_device_key = "select device_key from users where userid='{}'"

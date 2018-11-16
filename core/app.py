@@ -135,28 +135,32 @@ def is_uid_available():
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/login_info', methods=['OPTIONS','POST'])
+def login_info():
+    log.info('/login_info')
+    response = request.json
+    for_users_table_vals = "('{}','{}','{}','{}')".format(response["name"],response["email"],response\
+                                                   ["userid"],response["password"])
+    statement = query.login_info.format(for_users_table_vals)
+    log.info("query: {}".format(statement))
+    ok = db_insup(statement)
+
+    return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
 @application.route('/register_user_info', methods=['OPTIONS','POST'])
 def register_user_info():
     log.info("/register_user_info")
     response = request.json
-    for_users_table_vals = "('{}','{}','{}','{}','{}')".format(response["name"],response["email"],response\
-                                                   ["userid"],response["role"],response["org"])
-    statement = query.register_user_info_1.format(for_users_table_vals)
+    for_users_info_table_vals = "('{}',{},'{}',{},{},'{}','{}',{})".\
+                                format(response["userid"],response["age"],\
+                                response["gender"],response["height"],response["weight"],\
+                                response["s_id"],response["org"],response["role"])
+    statement = query.register_user_info.format(for_users_info_table_vals)
     log.info("query: {}".format(statement))
-    users_ins_ok = db_insup(statement)
-    user_inf_ins_ok = False
-    if users_ins_ok:
-        for_users_info_table_vals = "('{}',{},'{}',{},{},'{}')".format(response["userid"],response["age"],response["gender"],\
-                                                                    response["height"],response["weight"],response["s_id"])
-        statement = query.register_user_info_2.format(for_users_info_table_vals)
-        log.info("query: {}".format(statement))
-        user_inf_ins_ok = db_insup(statement)
-        if not user_inf_ins_ok:
-            statement = "delete from users where userid = '{}'".format(response["userid"])
-            ok = db_insup(statement)
-            log.info("deleted row: {}".format(ok))
+    ok = db_insup(statement)
 
-    return Response(json.dumps({"register": users_ins_ok and user_inf_ins_ok}), headers=HEADER, status=200, mimetype='application/json')
+    return Response(json.dumps({"register": ok}), headers=HEADER, status=200, mimetype='application/json')
 
 
 @application.route('/save_response', methods=['OPTIONS','POST'])
@@ -188,7 +192,43 @@ def edit_qstn_response():
     return Response(json.dumps(send_response), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/get_injury_history', methods=['GET'])
+def get_injury_history():
+    log.info('/get_injury_history')
+    args = request.args.to_dict()["userid"]
+    statement = query.get_injury_history.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    send_data = []
+    for res in result:
+        injury_data = templates.get_injury_data
+        injury_data["desc"],injury_data["date"],injury_data["type"],\
+        injury_data["location"],injury_data["region"] = res[1],str(res[2]),res[3],res[4],res[5]
+        send_data.append(injury_data)
 
+    return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/register_device_key', methods=['OPTIONS','POST'])
+def register_device_key():
+    log.info("/register_device_key")
+    response = request.json
+    statement = query.register_device_key.format(response["device_key"],response["user_id"])
+    log.info("query: {}".format(statement))
+    ok = db_insup(statement)
+
+    return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_device_key', methods=['GET'])
+def get_device_key():
+    log.info('/get_device_key')
+    args = request.args.to_dict()["userid"]
+    statement = query.get_device_key.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+
+    return Response(json.dumps({"device_key":result[0][0]}), headers=HEADER, status=200, mimetype='application/json')
 
 
 if __name__ == '__main__':
