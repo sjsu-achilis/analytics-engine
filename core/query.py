@@ -31,7 +31,7 @@ register_injury = "insert into injury_history values {}"
 
 get_user_info_validate_user = "select password from users where userid = '{}'"
 
-get_user_info_1 = "select name,email from users where userid = '{}'"
+get_user_info_1 = "select name,email,device_key from users where userid = '{}'"
 
 get_user_info_2 = "select age,gender,height,weight,sport_id,organization,role from user_information where userid = '{}'"
 

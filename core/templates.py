@@ -27,5 +27,6 @@ get_user_info = {
     "weight": "",
     "organization": "",
     "role": "",
-    "sports": ""
+    "sports": "",
+    "device_key": ""
 }

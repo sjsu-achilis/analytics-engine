@@ -44,6 +44,7 @@ def get_user_details(userid):
     if len(result)>0:
         user_data["name"] = result[0][0]
         user_data["email"] = result[0][1]
+        user_data["device_key"] = result[0][2]
         user_data["user_present"] = True
 
     statement_user_info = query.get_user_info_2.format(userid)
