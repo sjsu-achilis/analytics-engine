@@ -35,6 +35,31 @@ def pretty_print_POST(req):
         '\n'.join('{}: {}'.format(k, v) for k, v in req.args.to_dict().items()),
     ))
 
+def get_user_details(userid):
+    user_data = templates.get_user_info.copy()
+    statement_users = query.get_user_info_1.format(userid)
+    log.info("query: {}".format(statement_users))
+    result = db_fetch(statement_users)
+    print "result: ",result
+    if len(result)>0:
+        user_data["name"] = result[0][0]
+        user_data["email"] = result[0][1]
+        user_data["user_present"] = True
+
+    statement_user_info = query.get_user_info_2.format(userid)
+    log.info("query: {}".format(statement_user_info))
+    result = db_fetch(statement_user_info)
+    if len(result)>0:
+        user_data["age"], user_data["gender"], user_data["height"], user_data["weight"],\
+        user_data["organization"], user_data["role"] = result[0][0], result[0][1],result[0][2],\
+        result[0][3],result[0][5],result[0][6]
+        statement_user_sports = query.get_user_info_3.format(result[0][4])
+        log.info("query: {}".format(statement_user_sports))
+        result = db_fetch(statement_user_sports)
+        user_data["sports"] = result[0][0]
+
+    return user_data
+
 
 @application.route('/', methods=['GET'])
 def verify():
@@ -216,7 +241,7 @@ def register_injury():
 
 
 @application.route('/get_user_info', methods=['OPTIONS','POST'])
-def get_user_info():
+def get_user_info_post():
     log.info('/get_user_info')
     pretty_print_POST(request)
     response = json.loads(request.data)
@@ -227,26 +252,16 @@ def get_user_info():
         return Response(json.dumps({"error": "user not registered"}), headers=HEADER, status=200, mimetype='application/json')
     if result[0][0] != response["password"]:
         return Response(json.dumps({"error": "password invalid"}), headers=HEADER, status=200, mimetype='application/json')
+    user_data = get_user_details(response["userid"])
 
-    user_data = templates.get_user_info
-    statement_users = query.get_user_info_1.format(response["userid"])
-    log.info("query: {}".format(statement_users))
-    result = db_fetch(statement_users)
-    if len(result)>0:
-        user_data["name"] = result[0][0]
-        user_data["email"] = result[0][1]
+    return Response(json.dumps(user_data), headers=HEADER, status=200, mimetype='application/json')
 
-    statement_user_info = query.get_user_info_2.format(response["userid"])
-    log.info("query: {}".format(statement_user_info))
-    result = db_fetch(statement_user_info)
-    if len(result)>0:
-        user_data["age"], user_data["gender"], user_data["height"], user_data["weight"],\
-        user_data["organization"], user_data["role"] = result[0][0], result[0][1],result[0][2],\
-        result[0][3],result[0][5],result[0][6]
-        statement_user_sports = query.get_user_info_3.format(result[0][4])
-        log.info("query: {}".format(statement_user_sports))
-        result = db_fetch(statement_user_sports)
-        user_data["sports"] = result[0][0]
+
+@application.route('/get_user_info', methods=['GET'])
+def get_user_info_get():
+    log.info('/get_user_info')
+    args = request.args.to_dict()["userid"]
+    user_data = get_user_details(args)
 
     return Response(json.dumps(user_data), headers=HEADER, status=200, mimetype='application/json')
 
@@ -260,7 +275,7 @@ def get_injury_history():
     result = db_fetch(statement)
     send_data = []
     for res in result:
-        injury_data = templates.get_injury_data
+        injury_data = templates.get_injury_data.copy()
         injury_data["desc"],injury_data["date"],injury_data["type"],\
         injury_data["location"],injury_data["region"] = res[1],str(res[2]),res[3],res[4],res[5]
         send_data.append(injury_data)

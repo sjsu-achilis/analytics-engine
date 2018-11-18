@@ -18,7 +18,7 @@ get_injury_data = {
 }
 
 get_user_info = {
-    "login": True,
+    "user_present": False,
     "name": "",
     "email": "",
     "age": "",
