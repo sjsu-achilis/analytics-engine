@@ -28,3 +28,11 @@ register_device_key = "update users set device_key='{}' where userid='{}'"
 get_device_key = "select device_key from users where userid='{}'"
 
 register_injury = "insert into injury_history values {}"
+
+get_user_info_1 = "select name,email from users where userid = '{}'"
+
+get_user_info_2 = "select age,gender,height,weight,sport_id,organization,role from user_information where userid = '{}'"
+
+get_user_info_3 = "select name from sports where id = '{}'"
+
+get_id_from_device_key = "select userid from users where device_key = '{}'"

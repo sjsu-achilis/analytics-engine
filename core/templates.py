@@ -16,3 +16,15 @@ get_injury_data = {
     u"location": u"",
     u"region": u""
 }
+
+get_user_info = {
+    "name": "",
+    "email": "",
+    "age": "",
+    "gender": "",
+    "height": "",
+    "weight": "",
+    "organization": "",
+    "role": "",
+    "sports": ""
+}

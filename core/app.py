@@ -191,6 +191,8 @@ def edit_qstn_response():
 
     return Response(json.dumps(send_response), headers=HEADER, status=200, mimetype='application/json')
 
+
+
 @application.route('/register_injury', methods=['OPTIONS','POST'])
 def register_injury():
     log.info("/register_injury")
@@ -206,6 +208,34 @@ def register_injury():
     ok = db_insup(statement)
 
     return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_user_info', methods=['GET'])
+def get_user_info():
+    log.info('/get_user_info')
+    args = request.args.to_dict()["userid"]
+    user_data = templates.get_user_info
+    statement_users = query.get_user_info_1.format(args)
+    log.info("query: {}".format(statement_users))
+    result = db_fetch(statement_users)
+    if len(result)>0:
+        user_data["name"] = result[0][0]
+        user_data["email"] = result[0][1]
+
+    statement_user_info = query.get_user_info_2.format(args)
+    log.info("query: {}".format(statement_user_info))
+    result = db_fetch(statement_user_info)
+    if len(result)>0:
+        user_data["age"], user_data["gender"], user_data["height"], user_data["weight"],\
+        user_data["organization"], user_data["role"] = result[0][0], result[0][1],result[0][2],\
+        result[0][3],result[0][5],result[0][6]
+        statement_user_sports = query.get_user_info_3.format(result[0][4])
+        log.info("query: {}".format(statement_user_sports))
+        result = db_fetch(statement_user_sports)
+        user_data["sports"] = result[0][0]
+
+    return Response(json.dumps(user_data), headers=HEADER, status=200, mimetype='application/json')
+
 
 @application.route('/get_injury_history', methods=['GET'])
 def get_injury_history():
@@ -244,6 +274,21 @@ def get_device_key():
     result = db_fetch(statement)
 
     return Response(json.dumps({"device_key":result[0][0]}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_id_from_device_key', methods=['GET'])
+def get_id_from_device_ke():
+    log.info('/get_id_from_device_key')
+    args = request.args.to_dict()["device_key"]
+    statement = query.get_id_from_device_key.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    send_data = "device_key does not exist"
+    if len(result)>0:
+        send_data = result[0][0]
+    
+    return Response(json.dumps({"user_id":send_data}), headers=HEADER, status=200, mimetype='application/json')
+
 
 
 if __name__ == '__main__':
