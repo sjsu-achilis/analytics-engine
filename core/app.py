@@ -22,7 +22,8 @@ log = logger.getLogger(__name__)
 application = Flask(__name__)
 CORS(application)
 
-HEADER = {'Access-Control-Allow-Origin': '*'}
+HEADER = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, Accept',}
 
 def pretty_print_POST(req):
     """
