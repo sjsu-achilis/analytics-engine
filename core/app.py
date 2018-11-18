@@ -22,8 +22,7 @@ log = logger.getLogger(__name__)
 application = Flask(__name__)
 CORS(application)
 
-HEADER = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, Accept',}
+HEADER = {'Access-Control-Allow-Origin': '*'}
 
 def pretty_print_POST(req):
     """
@@ -139,7 +138,8 @@ def is_uid_available():
 @application.route('/login_info', methods=['OPTIONS','POST'])
 def login_info():
     log.info('/login_info')
-    response = request.json
+    pretty_print_POST(request)
+    response = json.loads(request.data)
     for_users_table_vals = "('{}','{}','{}','{}')".format(response["name"],response["email"],response\
                                                    ["userid"],response["password"])
     statement = query.login_info.format(for_users_table_vals)
@@ -152,7 +152,8 @@ def login_info():
 @application.route('/register_user_info', methods=['OPTIONS','POST'])
 def register_user_info():
     log.info("/register_user_info")
-    response = request.json
+    pretty_print_POST(request)
+    response = json.loads(request.data)
     for_users_info_table_vals = "('{}',{},'{}',{},{},'{}','{}',{})".\
                                 format(response["userid"],response["age"],\
                                 response["gender"],response["height"],response["weight"],\
@@ -167,7 +168,8 @@ def register_user_info():
 @application.route('/save_response', methods=['OPTIONS','POST'])
 def save_response():
     log.info("/save_response")
-    response = request.json
+    pretty_print_POST(request)
+    response = json.loads(request.data)
     uid = response["user_id"]
     val = ""
     for a in response["answers"]:
@@ -180,8 +182,9 @@ def save_response():
 
 @application.route('/edit_qstn_response', methods=['OPTIONS','POST'])
 def edit_qstn_response():
+    pretty_print_POST(request)
     log.info("/edit_qstn_response")
-    response = request.json
+    response = json.loads(request.data)
     uid = response["user_id"]
     send_response = []
     for a in response["answers"]:
@@ -197,7 +200,8 @@ def edit_qstn_response():
 @application.route('/register_injury', methods=['OPTIONS','POST'])
 def register_injury():
     log.info("/register_injury")
-    response = request.json
+    pretty_print_POST(request)
+    response = json.loads(request.data)
     if response["date"]:
         date = response["date"]
     else:
@@ -211,19 +215,28 @@ def register_injury():
     return Response(json.dumps({"msg": ok}), headers=HEADER, status=200, mimetype='application/json')
 
 
-@application.route('/get_user_info', methods=['GET'])
+@application.route('/get_user_info', methods=['OPTIONS','POST'])
 def get_user_info():
     log.info('/get_user_info')
-    args = request.args.to_dict()["userid"]
+    pretty_print_POST(request)
+    response = json.loads(request.data)
+    statement_validate = query.get_user_info_validate_user.format(response["userid"])
+    log.info("query: {}".format(statement_validate))
+    result = db_fetch(statement_validate)
+    if len(result) == 0:
+        return Response(json.dumps({"error": "user not registered"}), headers=HEADER, status=200, mimetype='application/json')
+    if result[0][0] != response["password"]:
+        return Response(json.dumps({"error": "password invalid"}), headers=HEADER, status=200, mimetype='application/json')
+
     user_data = templates.get_user_info
-    statement_users = query.get_user_info_1.format(args)
+    statement_users = query.get_user_info_1.format(response["userid"])
     log.info("query: {}".format(statement_users))
     result = db_fetch(statement_users)
     if len(result)>0:
         user_data["name"] = result[0][0]
         user_data["email"] = result[0][1]
 
-    statement_user_info = query.get_user_info_2.format(args)
+    statement_user_info = query.get_user_info_2.format(response["userid"])
     log.info("query: {}".format(statement_user_info))
     result = db_fetch(statement_user_info)
     if len(result)>0:
@@ -258,7 +271,8 @@ def get_injury_history():
 @application.route('/register_device_key', methods=['OPTIONS','POST'])
 def register_device_key():
     log.info("/register_device_key")
-    response = request.json
+    pretty_print_POST(request)
+    response = json.loads(request.data)
     statement = query.register_device_key.format(response["device_key"],response["user_id"])
     log.info("query: {}".format(statement))
     ok = db_insup(statement)
@@ -278,7 +292,7 @@ def get_device_key():
 
 
 @application.route('/get_id_from_device_key', methods=['GET'])
-def get_id_from_device_ke():
+def get_id_from_device_key():
     log.info('/get_id_from_device_key')
     args = request.args.to_dict()["device_key"]
     statement = query.get_id_from_device_key.format(args)

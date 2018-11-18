@@ -18,6 +18,7 @@ get_injury_data = {
 }
 
 get_user_info = {
+    "login": True,
     "name": "",
     "email": "",
     "age": "",
