@@ -14,7 +14,7 @@ import query
 import templates
 from achlib.config import file_config
 from achlib.util import logger
-from achlib.util.dbutil import db_fetch, db_insup
+from achlib.util.dbutil import db_fetch, db_insup, generate_device_key
 
 config = file_config()
 log = logger.getLogger(__name__)
@@ -165,8 +165,8 @@ def login_info():
     log.info('/login_info')
     pretty_print_POST(request)
     response = json.loads(request.data)
-    for_users_table_vals = "('{}','{}','{}','{}')".format(response["name"],response["email"],response\
-                                                   ["userid"],response["password"])
+    for_users_table_vals = "('{}','{}','{}','{}','{}')".format(response["name"],response["email"],response\
+                                                   ["userid"],response["password"],generate_device_key())
     statement = query.login_info.format(for_users_table_vals)
     log.info("query: {}".format(statement))
     ok = db_insup(statement)
