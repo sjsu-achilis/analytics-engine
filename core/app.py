@@ -388,12 +388,29 @@ def get_event():
     result = db_fetch(statement)
     print result
     send_data = []
-    if len(result)>0:
-        send_data = result[0][0]
-    
+    for res in result:
+        event_data = templates.get_event.copy()
+        start_day_split,start_time_split,end_day_split,end_time_split = \
+        str(res[0]).split(' ')[0].split("-"), str(res[0]).split(' ')[1].split(":"),\
+        str(res[1]).split(' ')[0].split("-"), str(res[1]).split(' ')[1].split(":")
+
+        start,end = templates.get_event_sched.copy(), templates.get_event_sched.copy()
+
+        start["year"],start["month"],start["day"],start["hours"],start["minutes"],start["seconds"] = \
+        start_day_split[0],start_day_split[1],start_day_split[2],start_time_split[0],start_time_split[1],\
+        start_time_split[2]
+
+        end["year"],end["month"],end["day"],end["hours"],end["minutes"],end["seconds"] = \
+        end_day_split[0],end_day_split[1],end_day_split[2],end_time_split[0],end_time_split[1],\
+        end_time_split[2]
+
+        event_data["start"],event_data["end"],event_data["description"], event_data["title"] = \
+        start,end,res[2],res[3]
+
+        send_data.append(event_data)
+
+
     return Response(json.dumps({"userid":args, "events":send_data}), headers=HEADER, status=200, mimetype='application/json')
-
-
 
 
 

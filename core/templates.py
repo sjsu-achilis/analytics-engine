@@ -31,3 +31,19 @@ get_user_info = {
     "sport_id": "",
     "device_key": ""
 }
+
+get_event = {
+    "start": "",
+    "end": "",
+    "description": "",
+    "title": ""
+}
+
+get_event_sched = {
+    "year": "",
+    "month": "",
+    "day": "",
+    "hours": "",
+    "minutes": "",
+    "seconds": ""
+}
