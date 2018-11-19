@@ -52,12 +52,8 @@ def get_user_details(userid):
     result = db_fetch(statement_user_info)
     if len(result)>0:
         user_data["age"], user_data["gender"], user_data["height"], user_data["weight"],\
-        user_data["organization"], user_data["role"] = result[0][0], result[0][1],result[0][2],\
-        result[0][3],result[0][5],result[0][6]
-        statement_user_sports = query.get_user_info_3.format(result[0][4])
-        log.info("query: {}".format(statement_user_sports))
-        result = db_fetch(statement_user_sports)
-        user_data["sports"] = result[0][0]
+        user_data["sport_id"],user_data["organization"], user_data["role"] = result[0][0], \
+        result[0][1],result[0][2],result[0][3],result[0][4],result[0][5],result[0][6]
 
     return user_data
 
