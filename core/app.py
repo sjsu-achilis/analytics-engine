@@ -212,9 +212,10 @@ def edit_qstn_response():
         statement = query.edit_qstn_response.format(a["ans"],uid,a["qid"])
         log.info("query: {}".format(statement))
         ok = db_insup(statement)
-        send_response.append({"qid": a["qid"],"success":ok})
+        if ok:
+            send_response.append(a["qid"])
 
-    return Response(json.dumps(send_response), headers=HEADER, status=200, mimetype='application/json')
+    return Response(json.dumps({"updated_qids":send_response}), headers=HEADER, status=200, mimetype='application/json')
 
 
 
