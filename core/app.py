@@ -40,7 +40,6 @@ def get_user_details(userid):
     statement_users = query.get_user_info_1.format(userid)
     log.info("query: {}".format(statement_users))
     result = db_fetch(statement_users)
-    print "result: ",result
     if len(result)>0:
         user_data["name"] = result[0][0]
         user_data["email"] = result[0][1]
@@ -336,6 +335,25 @@ def get_id_from_device_key():
     
     return Response(json.dumps({"user_id":send_data}), headers=HEADER, status=200, mimetype='application/json')
 
+
+@application.route('/get_question_response', methods=['GET'])
+def get_question_response():
+    log.info('/get_question_response')
+    args = request.args.to_dict()["userid"]
+    statement = "SELECT qid,question from questionnaire"
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    lookup = dict(result)
+    
+    statement = query.get_question_response.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+
+    send_ans = []
+    for res in result:
+        send_ans.append({"qid": res[0], "qstn":lookup[res[0]], "response":res[1]})
+    
+    return Response(json.dumps({"user_id":args, "answers":send_ans}), headers=HEADER, status=200, mimetype='application/json')
 
 
 if __name__ == '__main__':

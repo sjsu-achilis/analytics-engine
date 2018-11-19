@@ -45,3 +45,5 @@ update_user_info_1 = "update users set name='{}',email='{}' where userid='{}'"
 
 update_user_info_2 = "update user_information set age={},gender='{}',height={},weight={},\
 sport_id='{}',organization='{}',role={} where userid='{}'"
+
+get_question_response = "select qid,response from questionnaire_response where userid='{}'"
