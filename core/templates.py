@@ -14,7 +14,8 @@ get_injury_data = {
     u"date": u"",
     u"type": u"",
     u"location": u"",
-    u"region": u""
+    u"region": u"",
+    u"intensity": None
 }
 
 get_user_info = {

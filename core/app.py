@@ -228,8 +228,8 @@ def register_injury():
         date = response["date"]
     else:
         date = str(datetime.datetime.now()).split('.')[0]
-    val = "('{}','{}','{}','{}','{}','{}')".format(response["userid"],response["desc"],\
-          date,response["type"],response["location"],response["region"])
+    val = "('{}','{}','{}','{}','{}','{}',{})".format(response["userid"],response["desc"],\
+          date,response["type"],response["location"],response["region"],response["intensity"])
     statement = query.register_injury.format(val)
     log.info("query: {}".format(statement))
     ok = db_insup(statement)
@@ -294,7 +294,8 @@ def get_injury_history():
     for res in result:
         injury_data = templates.get_injury_data.copy()
         injury_data["desc"],injury_data["date"],injury_data["type"],\
-        injury_data["location"],injury_data["region"] = res[1],str(res[2]),res[3],res[4],res[5]
+        injury_data["location"],injury_data["region"],injury_data["intensity"]\
+        = res[1],str(res[2]),res[3],res[4],res[5],res[6]
         send_data.append(injury_data)
 
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
@@ -355,6 +356,45 @@ def get_question_response():
         send_ans.append({"qid": res[0], "qstn":lookup[res[0]], "response":res[1]})
     
     return Response(json.dumps({"user_id":args, "answers":send_ans}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/post_event', methods=['OPTIONS','POST'])
+def post_event():
+    log.info("/post_event")
+    pretty_print_POST(request)
+    response = json.loads(request.data)
+    start_date = '-'.join([response["start"]["year"],response["start"]["month"],response["start"]["day"]])
+    start_time = ':'.join([response["start"]["hours"],response["start"]["minutes"],response["start"]["seconds"]])
+    start = ' '.join([start_date,start_time])
+    end_date = '-'.join([response["end"]["year"],response["end"]["month"],response["end"]["day"]])
+    end_time = ':'.join([response["end"]["hours"],response["end"]["minutes"],response["end"]["seconds"]])
+    end = ' '.join([end_date,end_time])
+    created = str(datetime.datetime.now()).split('.')[0]
+    
+    vals = "('{}','{}','{}','{}','{}','{}')".format(start,created,response["desc"],response["title"],end,response["userid"])
+    statement = query.post_event.format(vals)
+    log.info("query: {}".format(statement))
+    ok = db_insup(statement)
+
+    return Response(json.dumps({"event_created": ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_event', methods=['GET'])
+def get_event():
+    log.info('/get_event')
+    args = request.args.to_dict()["userid"]
+    statement = query.get_event.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    print result
+    send_data = []
+    if len(result)>0:
+        send_data = result[0][0]
+    
+    return Response(json.dumps({"userid":args, "events":send_data}), headers=HEADER, status=200, mimetype='application/json')
+
+
+
 
 
 if __name__ == '__main__':

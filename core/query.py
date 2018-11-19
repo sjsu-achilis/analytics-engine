@@ -47,3 +47,7 @@ update_user_info_2 = "update user_information set age={},gender='{}',height={},w
 sport_id='{}',organization='{}',role={} where userid='{}'"
 
 get_question_response = "select qid,response from questionnaire_response where userid='{}'"
+
+post_event = "insert into event values {}"
+
+get_event = "select event_start_ts,event_end_ts,event_description,title from event where userid='{}'"
