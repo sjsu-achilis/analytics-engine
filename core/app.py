@@ -194,7 +194,7 @@ def save_response():
     uid = response["user_id"]
     val = ""
     for a in response["answers"]:
-        val += ",('{}','{}',{},'{}')".format(uid,a["qid"],a["ans"],str(datetime.datetime.now()).split('.')[0])
+        val += ",('{}','{}','{}','{}')".format(uid,a["qid"],a["ans"],str(datetime.datetime.now()).split('.')[0])
     log.info("query: {}".format(query.save_response_ins.format(val[1:])))
     ok = db_insup(query.save_response_ins.format(val[1:]))
 

@@ -11,7 +11,7 @@ get_questions = "select * from questionnaire"
 
 save_response_ins = "insert into questionnaire_response values {}"
 
-edit_qstn_response = "update questionnaire_response set response={} \
+edit_qstn_response = "update questionnaire_response set response='{}' \
 where userid='{}' and qid='{}'"
 
 get_sports = "select * from sports"
