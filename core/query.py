@@ -11,7 +11,8 @@ get_questions = "select * from questionnaire"
 
 save_response_ins = "insert into questionnaire_response values {}"
 
-edit_qstn_response = "update questionnaire_response set response={} where userid='{}' and qid='{}'"
+edit_qstn_response = "update questionnaire_response set response={} \
+where userid='{}' and qid='{}'"
 
 get_sports = "select * from sports"
 
@@ -33,8 +34,14 @@ get_user_info_validate_user = "select password from users where userid = '{}'"
 
 get_user_info_1 = "select name,email,device_key from users where userid = '{}'"
 
-get_user_info_2 = "select age,gender,height,weight,sport_id,organization,role from user_information where userid = '{}'"
+get_user_info_2 = "select age,gender,height,weight,sport_id,organization,role from \
+user_information where userid = '{}'"
 
 get_user_info_3 = "select name from sports where id = '{}'"
 
 get_id_from_device_key = "select userid from users where device_key = '{}'"
+
+update_user_info_1 = "update users set name='{}',email='{}' where userid='{}'"
+
+update_user_info_2 = "update user_information set age={},gender='{}',height={},weight={},\
+sport_id='{}',organization='{}',role={} where userid='{}'"

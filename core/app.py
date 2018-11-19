@@ -258,6 +258,26 @@ def get_user_info_post():
     return Response(json.dumps(user_data), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/update_user_info', methods=['OPTIONS','POST'])
+def update_user_info():
+    pretty_print_POST(request)
+    log.info("/update_user_info")
+    response = json.loads(request.data)
+    uid = response["userid"]
+    statement_update_users = query.update_user_info_1.format(response["name"],response["email"],uid)
+    log.info("query: {}".format(statement_update_users))
+    ok_users = db_insup(statement_update_users)
+
+    statement_update_user_info = query.update_user_info_2.format(response["age"],response["gender"],\
+                                 response["height"],response["weight"],response["sport_id"],\
+                                 response["organization"],response["role"],uid)
+    log.info("query: {}".format(statement_update_user_info))
+    ok_user_information = db_insup(statement_update_user_info)
+    ok = ok_users and ok_user_information
+
+    return Response(json.dumps({"update":ok}), headers=HEADER, status=200, mimetype='application/json')
+
+
 @application.route('/get_user_info', methods=['GET'])
 def get_user_info_get():
     log.info('/get_user_info')
