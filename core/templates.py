@@ -20,6 +20,7 @@ get_injury_data = {
 
 get_user_info = {
     "user_present": False,
+    "userid": "",
     "name": "",
     "email": "",
     "age": "",
