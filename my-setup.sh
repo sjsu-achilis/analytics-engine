@@ -6,16 +6,6 @@ echo 'installing homebrew'
 echo 'tapping cask'
 brew tap caskroom/cask
 
-#setup iterm2, vscode and slack
-echo 'installing slack'
-brew cask install slack
-
-echo 'installing vscode'
-brew cask install visual-studio-code
-
-echo 'installing iterm2'
-brew cask install iterm2
-
 #install psql
 echo 'installing psql'
 brew install postgres
@@ -50,5 +40,15 @@ cd core
 source ../achcore/bin/activate
 
 sudo pip install -r requirements.txt
+
+#setup iterm2, vscode and slack
+echo 'installing slack'
+brew cask install slack
+
+echo 'installing vscode'
+brew cask install visual-studio-code
+
+echo 'installing iterm2'
+brew cask install iterm2
 
 echo 'all done...please goto docker site and installdocker for mac and you are all set'

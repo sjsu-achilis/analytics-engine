@@ -55,3 +55,5 @@ get_event = "select event_start_ts,event_end_ts,event_description,title from eve
 register_app_instance = "insert into app_tokens values ('{}','{}')"
 
 register_coach_student = "insert into athlete_relations values ('{}','{}','{}',{})"
+
+get_coach_types = "select * from coach_type"

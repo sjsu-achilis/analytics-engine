@@ -393,6 +393,18 @@ def register_app_instance():
     return Response(json.dumps({"event_created": ok}), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/get_coach_types', methods=['GET'])
+def get_coach_types():
+    log.info('/get_coach_types')
+    statement = query.get_coach_types
+    result = db_fetch(statement)
+    send_data = []
+    for r in result:
+        send_data.append(collections.OrderedDict({u"type_id": r[0], u"type": r[1]}))
+
+    return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
 @application.route('/register_coach_student', methods=['OPTIONS','POST'])
 def register_coach_student():
     log.info("/register_coach_student")
