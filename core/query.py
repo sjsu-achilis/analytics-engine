@@ -57,3 +57,7 @@ register_app_instance = "insert into app_tokens values ('{}','{}')"
 register_coach_student = "insert into athlete_relations values ('{}','{}','{}',{})"
 
 get_coach_types = "select * from coach_type"
+
+get_athelete_ids1 = "select organization from user_information where userid = '{}'"
+
+get_athelete_ids2 = "select userid from user_information where organization = '{}'"

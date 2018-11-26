@@ -397,12 +397,32 @@ def register_app_instance():
 def get_coach_types():
     log.info('/get_coach_types')
     statement = query.get_coach_types
+    log.info("query: {}".format(statement))
     result = db_fetch(statement)
     send_data = []
     for r in result:
         send_data.append(collections.OrderedDict({u"type_id": r[0], u"type": r[1]}))
 
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_athelete_ids', methods=['GET'])
+def get_athelete_ids():
+    log.info('/get_athelete_ids')
+    args = request.args.to_dict()["coachid"]
+    statement1 = query.get_athelete_ids1.format(args)
+    log.info("query: {}".format(statement1))
+    result = db_fetch(statement1)
+    send_data = []
+    if len(result)>0:
+        statement2 = query.get_athelete_ids2.format(result[0][0])
+        log.info("query: {}".format(statement2))
+        result = db_fetch(statement2)
+        for r in result:
+            if r[0] != args:
+                send_data.append(r[0])
+
+    return Response(json.dumps({"athelete_ids":send_data}), headers=HEADER, status=200, mimetype='application/json')
 
 
 @application.route('/register_coach_student', methods=['OPTIONS','POST'])
