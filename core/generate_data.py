@@ -13,9 +13,13 @@ firebase_admin.initialize_app(cred, {
 # As an admin, the app has access to read and write all data, regradless of Security Rules
 ref = db.reference('users')
 users_ref = ref.child('dev1234')
-users_ref.set({
-    'hert_rate': 135,
-    'no_of_steps': 2000,
-})
 
-print ref.get()
+'''
+for i in range(10000):
+    users_ref.set({
+        'hert_rate': i,
+        'no_of_steps': i
+    })
+
+#print ref.get()
+'''

@@ -441,6 +441,19 @@ def register_coach_student():
     return Response(json.dumps({"inserted": send_data}), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/get_athletes_for_coach', methods=['GET'])
+def get_athletes_for_coach():
+    log.info('/get_athletes_for_coach')
+    args = request.args.to_dict()["coachid"]
+    statement = query.get_athletes_for_coach.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    send_data = []
+    for r in result:
+        send_data.append({"id":r[0],"name":r[1]})
+
+    return Response(json.dumps({"atheletes":send_data}), headers=HEADER, status=200, mimetype='application/json')
+
 
 if __name__ == '__main__':
     application.run(host='0.0.0.0', debug=True)

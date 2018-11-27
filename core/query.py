@@ -63,3 +63,5 @@ get_athelete_ids1 = "select organization from user_information where userid = '{
 get_athelete_ids2 = "select distinct ui.userid, u.name from user_information ui inner join \
 users u on ui.userid=u.userid where ui.organization='{}'"
 
+get_athletes_for_coach = "select u.userid, u.name from athlete_relations ar inner join users \
+u on ar.athlete_id=u.userid where ar.coach_id='{}'"
