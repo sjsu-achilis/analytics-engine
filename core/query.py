@@ -60,4 +60,6 @@ get_coach_types = "select * from coach_type"
 
 get_athelete_ids1 = "select organization from user_information where userid = '{}'"
 
-get_athelete_ids2 = "select userid from user_information where organization = '{}'"
+get_athelete_ids2 = "select distinct ui.userid, u.name from user_information ui inner join \
+users u on ui.userid=u.userid where ui.organization='{}'"
+

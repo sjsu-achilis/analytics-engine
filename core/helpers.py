@@ -41,3 +41,4 @@ def get_user_details(userid):
         result[0][1],result[0][2],result[0][3],result[0][4],result[0][5],result[0][6]
 
     return user_data
+    

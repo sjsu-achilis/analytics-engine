@@ -420,7 +420,7 @@ def get_athelete_ids():
         result = db_fetch(statement2)
         for r in result:
             if r[0] != args:
-                send_data.append(r[0])
+                send_data.append({"id":r[0],"name":r[1]})
 
     return Response(json.dumps({"athelete_ids":send_data}), headers=HEADER, status=200, mimetype='application/json')
 
