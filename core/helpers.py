@@ -2,6 +2,8 @@
 
 import query
 import templates
+import csv
+
 from achlib.config import file_config
 from achlib.util import logger
 from achlib.util.dbutil import db_fetch, db_insup, generate_device_key
@@ -41,4 +43,20 @@ def get_user_details(userid):
         result[0][1],result[0][2],result[0][3],result[0][4],result[0][5],result[0][6]
 
     return user_data
+
+    
+def insert_user_health_stats(userid=None):
+    f = open('One_Year_of_FitBitChargeHR_Data.csv', 'rb')
+    reader = csv.reader(f)
+    q = "insert into health_metrics values ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')"
+    for i,row in enumerate(reader):
+        if i==0:
+            continue
+        replace = '.'.join(row[3].split(','))
+        date = '-'.join([row[0].split('-')[1],row[0].split('-')[0],row[0].split('-')[2]])
+        statement = q.format(date,userid,row[1],row[2],replace,row[4],row[5],row[6],row[7],row[8],row[9])
+        log.info("query: {}".format(statement))
+        ok = db_insup(statement)
+        log.info("row {}: {}".format(i,ok))
+        
     
