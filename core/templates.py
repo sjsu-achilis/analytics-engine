@@ -48,3 +48,15 @@ get_event_sched = {
     "minutes": "",
     "seconds": ""
 }
+
+get_daily_health_data = {
+    "calories": None,
+    "steps": None,
+    "floors": None,
+    "distance": None,
+    "minutes_sitting": None,
+    "minutes_of_slow_activity": None,
+    "minutes_of_moderate_activity": None,
+    "minutes_of_intense_activity": None,
+    "calories_activty": None
+}

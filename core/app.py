@@ -455,5 +455,25 @@ def get_athletes_for_coach():
     return Response(json.dumps({"atheletes":send_data}), headers=HEADER, status=200, mimetype='application/json')
 
 
+
+@application.route('/get_daily_health_data', methods=['GET'])
+def get_daily_health_data():
+    log.info('/get_daily_health_data')
+    args = request.args.to_dict()["userid"]
+    statement = query.get_daily_health_data.format(args)
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    send_data = {}
+    for r in result:
+        u_data = templates.get_daily_health_data.copy()
+        u_data["calories"], u_data["steps"], u_data["floors"], u_data["distance"], u_data["minutes_sitting"],\
+        u_data["minutes_of_slow_activity"], u_data["minutes_of_moderate_activity"],\
+        u_data["minutes_of_intense_activity"], u_data["calories_activty"] = r[2], r[3], r[4], r[5], r[6], r[7],\
+        r[8], r[9], r[10]
+        send_data[str(r[0])] = u_data
+
+    return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
 if __name__ == '__main__':
     application.run(host='0.0.0.0', debug=True)

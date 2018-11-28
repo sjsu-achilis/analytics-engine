@@ -37,7 +37,7 @@ def simulate_player(cur_day):
             'distance_covered': float(i*0.762)
         })
         i += 1
-        time.sleep(1)
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":
