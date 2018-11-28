@@ -26,6 +26,7 @@
 *.sql
 *.sqlite
 *.csv
+*.out
 
 # OS generated files #
 ######################

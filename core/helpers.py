@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import query
 import templates
 import csv
@@ -58,5 +57,5 @@ def insert_user_health_stats(userid=None):
         log.info("query: {}".format(statement))
         ok = db_insup(statement)
         log.info("row {}: {}".format(i,ok))
-        
+
     
