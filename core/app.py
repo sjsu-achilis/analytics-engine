@@ -478,5 +478,38 @@ def get_daily_health_data():
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
 
 
+@application.route('/add_day_data', methods=['OPTIONS','POST'])
+def add_day_data():
+    log.info("/add_day_data")
+    pretty_print_POST(request)
+    response = json.loads(request.data)
+    ok_add, ok_once, ok_inc = False, False, False
+    if len(db_fetch(query.add_day_data_check_rows.format(response["date"],response["userid"]))) == 0:
+        log.info("adding row for date {} for user {}".format(response["date"],response["userid"]))
+        statement = query.add_day_data_add_row.format(response["date"],response["userid"])
+        log.info("query: {}".format(statement))
+        ok_add = db_insup(statement)
+    
+    if response["add_type"] == "once":
+        statement = query.add_day_data_set_value_once.format(response["type"],response["value"],response["date"],response["userid"])
+        log.info("query: {}".format(statement))
+        ok_once = db_insup(statement)
+
+    if response["add_type"] == "increment":
+        statement = query.add_day_data_fetch_value.format(response["type"],response["date"],response["userid"])
+        log.info("query: {}".format(statement))
+        result = db_fetch(statement)
+        new_val = float(response["value"])
+        print result
+        if result[0][0]:
+            new_val += float(result[0][0])
+        log.info("updating value")
+        statement = query.add_day_data_set_value_once.format(response["type"],new_val,response["date"],response["userid"])
+        log.info("query: {}".format(statement))
+        ok_inc = db_insup(statement)
+
+    return Response(json.dumps({"inserted": ok_add or ok_once or ok_inc}), headers=HEADER, status=200, mimetype='application/json')
+
+
 if __name__ == '__main__':
     application.run(host='0.0.0.0', debug=True)

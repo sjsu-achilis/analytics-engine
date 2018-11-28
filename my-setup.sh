@@ -51,4 +51,7 @@ brew cask install visual-studio-code
 echo 'installing iterm2'
 brew cask install iterm2
 
+echo 'installing postman'
+brew cask install postman
+
 echo 'all done...please goto docker site and installdocker for mac and you are all set'
