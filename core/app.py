@@ -459,8 +459,8 @@ def get_athletes_for_coach():
 @application.route('/get_daily_health_data', methods=['GET'])
 def get_daily_health_data():
     log.info('/get_daily_health_data')
-    args = request.args.to_dict()["userid"]
-    statement = query.get_daily_health_data.format(args)
+    args = request.args.to_dict()
+    statement = query.get_daily_health_data.format(args["start_date"],args["end_date"],args["userid"])
     log.info("query: {}".format(statement))
     result = db_fetch(statement)
     send_data = {}
@@ -471,6 +471,9 @@ def get_daily_health_data():
         u_data["minutes_of_intense_activity"], u_data["calories_activty"] = r[2], r[3], r[4], r[5], r[6], r[7],\
         r[8], r[9], r[10]
         send_data[str(r[0])] = u_data
+    
+    if not send_data:
+        send_data = None
 
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
 

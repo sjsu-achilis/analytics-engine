@@ -66,4 +66,4 @@ users u on ui.userid=u.userid where ui.organization='{}'"
 get_athletes_for_coach = "select u.userid, u.name from athlete_relations ar inner join users \
 u on ar.athlete_id=u.userid where ar.coach_id='{}'"
 
-get_daily_health_data = "select * from health_metrics where userid = '{}'"
+get_daily_health_data = "select * from health_metrics where event_timestamp between '{}' and '{}' and userid = '{}'"
