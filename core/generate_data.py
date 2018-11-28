@@ -1,5 +1,6 @@
 import time
 import datetime
+import os
 
 import firebase_admin
 from firebase_admin import credentials
@@ -12,8 +13,8 @@ config = file_config()
 log = logger.getLogger(__name__)
 
 # Fetch the service account key JSON file contents
-cred = credentials.Certificate('key.json')
 
+cred = credentials.Certificate(os.environ.get('PYTHONPATH')+'/core/key.json')
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://cmpe295-achilis.firebaseio.com'
