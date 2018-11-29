@@ -2,6 +2,8 @@
 import query
 import templates
 import csv
+import random
+import math
 
 from achlib.config import file_config
 from achlib.util import logger
@@ -44,26 +46,31 @@ def get_user_details(userid):
     return user_data
 
     
-def convert_float(val):
+def convert_float(val,scale):
     if '.' in val:
-        return str(float(val)*1000)
-    return str(float(val))
+        return str(math.ceil(float(val)*1000*scale))
+    return str(math.ceil(float(val)*scale))
 
-def insert_user_health_stats(userid=None):
+
+def insert_user_health_stats(userid=None, do_scale=False):
     f = open('One_Year_of_FitBitChargeHR_Data.csv', 'rb')
     reader = csv.reader(f)
     q = "insert into health_metrics values ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')"
     for i,row in enumerate(reader):
+        scale = 1.0
         if i==0:
             continue
-        
+        if do_scale:
+            scale = random.uniform(0.5,1.0)
+
         date = '-'.join([row[0].split('-')[1],row[0].split('-')[0],row[0].split('-')[2]])
-        calorie,steps,dist,floors,m_sitting,m_slow,m_mod,m_int,cal_act = convert_float(row[1]),\
-        convert_float(row[2]),convert_float('.'.join(row[3].split(','))),float(row[4]),\
-        convert_float(row[5]),convert_float(row[6]),convert_float(row[7]),convert_float(row[8]),\
-        convert_float(row[9])
+        calorie,steps,dist,floors,m_sitting,m_slow,m_mod,m_int,cal_act = convert_float(row[1],scale),\
+        convert_float(row[2],scale),convert_float('.'.join(row[3].split(',')),scale),convert_float(row[4],scale),\
+        convert_float(row[5],scale),convert_float(row[6],scale),convert_float(row[7],scale),convert_float(row[8],scale),\
+        convert_float(row[9],scale)
         
         statement = q.format(date,userid,calorie,steps,floors,dist,m_sitting,m_slow,m_mod,m_int,cal_act)
         log.info("query: {}".format(statement))
         ok = db_insup(statement)
         log.info("row {}: {}".format(i,ok))
+
