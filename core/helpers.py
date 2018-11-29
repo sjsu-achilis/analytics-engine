@@ -44,6 +44,11 @@ def get_user_details(userid):
     return user_data
 
     
+def convert_float(val):
+    if '.' in val:
+        return str(float(val)*1000)
+    return str(float(val))
+
 def insert_user_health_stats(userid=None):
     f = open('One_Year_of_FitBitChargeHR_Data.csv', 'rb')
     reader = csv.reader(f)
@@ -51,11 +56,14 @@ def insert_user_health_stats(userid=None):
     for i,row in enumerate(reader):
         if i==0:
             continue
-        replace = '.'.join(row[3].split(','))
+        
         date = '-'.join([row[0].split('-')[1],row[0].split('-')[0],row[0].split('-')[2]])
-        statement = q.format(date,userid,row[1],row[2],replace,row[4],row[5],row[6],row[7],row[8],row[9])
+        calorie,steps,dist,floors,m_sitting,m_slow,m_mod,m_int,cal_act = convert_float(row[1]),\
+        convert_float(row[2]),convert_float('.'.join(row[3].split(','))),float(row[4]),\
+        convert_float(row[5]),convert_float(row[6]),convert_float(row[7]),convert_float(row[8]),\
+        convert_float(row[9])
+        
+        statement = q.format(date,userid,calorie,steps,floors,dist,m_sitting,m_slow,m_mod,m_int,cal_act)
         log.info("query: {}".format(statement))
         ok = db_insup(statement)
         log.info("row {}: {}".format(i,ok))
-
-    
