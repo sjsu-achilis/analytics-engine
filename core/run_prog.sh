@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python $PYTHONPATH/core/simulate_players.py >> /logs/core$(date +%Y_%m_%d).log &
+python $PYTHONPATH/core/simulate_players.py 2>&1 >> /logs/core$(date +%Y_%m_%d).log &
 
 sleep 5
 

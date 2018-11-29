@@ -4,6 +4,8 @@ import templates
 import csv
 import random
 import math
+import datetime
+from datetime import timedelta, date
 
 from achlib.config import file_config
 from achlib.util import logger
@@ -52,6 +54,17 @@ def convert_float(val,scale):
     return str(math.ceil(float(val)*scale))
 
 
+def daterange(date1, date2):
+    ret = []
+    for n in range(int ((date2 - date1).days)+1):
+        ret.append((date1 + timedelta(n)).strftime("%Y-%m-%d"))
+
+    return ret
+
+def session_data_list(d,userid):
+    pass
+
+
 def insert_user_health_stats(userid=None, do_scale=False):
     f = open('One_Year_of_FitBitChargeHR_Data.csv', 'rb')
     reader = csv.reader(f)
@@ -73,4 +86,20 @@ def insert_user_health_stats(userid=None, do_scale=False):
         log.info("query: {}".format(statement))
         ok = db_insup(statement)
         log.info("row {}: {}".format(i,ok))
+
+
+def generate_session_data():
+    users = ['2134225533','1342252213','1673662323','9978656676','1414252511']
+    f = open('session.csv','w+')
+    writer = csv.writer(f)
+    for user in users:
+        print user
+        start_dt = date(2015, 5, 8)
+    	end_dt = date(2016, 5, 7)
+        dates = daterange(start_dt,end_dt)
+        for d in dates:
+            writer.writerow(session_data_list(d,user))
+
+if __name__ == "__main__":
+    generate_session_data()
 

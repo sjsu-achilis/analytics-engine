@@ -75,3 +75,13 @@ add_day_data_add_row = "insert into health_metrics values ('{}','{}')"
 add_day_data_set_value_once = "update health_metrics set {}='{}' where event_timestamp = '{}' and userid = '{}'"
 
 add_day_data_fetch_value = "select {} from health_metrics where event_timestamp = '{}' and userid = '{}'"
+
+get_session_questions = "select id, question from session_questions"
+
+register_session_info1 = "insert into sessions values ({},'{}','{}','{}','{}','{}')"
+
+register_session_info2 = "update sessions set rating = {} where id = {}"
+
+register_session_info3 = "insert into session_answers values ({},{},{})"
+
+

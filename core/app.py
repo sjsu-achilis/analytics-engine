@@ -3,6 +3,7 @@ import os
 import sys
 import collections
 import datetime
+import math
 
 import requests
 from flask import Flask, request, Response
@@ -14,7 +15,7 @@ import query
 import templates
 from achlib.config import file_config
 from achlib.util import logger
-from achlib.util.dbutil import db_fetch, db_insup, generate_device_key
+from achlib.util.dbutil import db_fetch, db_insup, generate_device_key, generate_session_id
 from helpers import pretty_print_POST, get_user_details
 
 config = file_config()
@@ -509,6 +510,57 @@ def add_day_data():
         ok_inc = db_insup(statement)
 
     return Response(json.dumps({"inserted": ok_add or ok_once or ok_inc}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_session_questions', methods=['GET'])
+def get_session_questions():
+    log.info('/get_session_questions')
+    statement = query.get_session_questions
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    send_data = []
+    for r in result:
+        send_data.append({"q_id":r[0],"qstn":r[1]})
+
+    return Response(json.dumps({"questions":send_data}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/register_session_info', methods=['OPTIONS','POST'])
+def register_session_info():
+    log.info("/register_session_info")
+    pretty_print_POST(request)
+    response = json.loads(request.data)
+    session_id = generate_session_id()
+    uid, answers, start_ts, end_ts = response["userid"], response["answers"], \
+                                     response["start"], response["end"]
+    if not response["date"]:
+        date = str(datetime.datetime.now()).split(' ')[0]
+    else:
+        date = response["date"]
+    start_ts = ' '.join([date,start_ts])
+    end_ts = ' '.join([date,end_ts])
+    start = datetime.datetime.strptime(start_ts, '%Y-%m-%d %H:%M:%S')
+    end   = datetime.datetime.strptime(end_ts, '%Y-%m-%d %H:%M:%S')
+    duration = math.ceil(float((end-start).seconds/60.0))
+
+    statement = query.register_session_info1.format(session_id,date,uid,start,end,duration)
+    log.info("query: {}".format(statement))
+    ok_1 = db_insup(statement)
+
+    for ans in answers:
+        if ans["q_id"] == "0":
+            statement = query.register_session_info2.format(ans["val"],session_id)
+            log.info("query: {}".format(statement))
+            ok_2 = db_insup(statement)
+        else:
+            statement = query.register_session_info3.format(session_id,ans["q_id"],ans["val"])
+            log.info("query: {}".format(statement))
+            ok_3 = db_insup(statement)
+
+    return Response(json.dumps({"insert":ok_1 and ok_2 and ok_3}), headers=HEADER, status=200, mimetype='application/json')   
+
+
+## TODO: write get_session_info_for_user and edit_session_info
 
 
 if __name__ == '__main__':

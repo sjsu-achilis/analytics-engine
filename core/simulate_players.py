@@ -40,11 +40,11 @@ def simulate_player(cur_day):
     while True:
         # set no of steps to 0 when day changes
         if cur_day != str(datetime.datetime.now().day):
-            cur_day, = str(datetime.datetime.now().day)
+            cur_day = str(datetime.datetime.now().day)
             for user in userids:
                 users_ref = ref.child(user)
                 users_ref.update({
-                    'no_of_steps': 0,
+                    'no_of_steps': 0
                 })
         
         for user in userids:
@@ -60,7 +60,7 @@ def simulate_player(cur_day):
                 })
             else:
                 users_ref.update({
-                    'heart_rate': hr,
+                    'heart_rate': hr
                 })
 
         time.sleep(0.5)
