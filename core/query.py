@@ -88,4 +88,9 @@ get_session_info1 = "select * from sessions where date between '{}' and '{}' and
 
 get_session_info2 = "select * from session_answers where session_id in {}"
 
+update_session_info1 = "update sessions set start_timestamp='{}', end_timestamp='{}', duration='{}', rating = '{}' \
+where id={}"
 
+update_session_info2 = "update session_answers set response='{}' where session_id='{}' and qid='{}'"
+
+get_session_id = "select id from sessions where date='{}' and userid='{}'"

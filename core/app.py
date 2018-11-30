@@ -575,27 +575,73 @@ def get_session_info():
 
     statement = query.get_session_info2.format(session_ids)
     log.info("query: {}".format(statement))
-    result_s2 = db_fetch(statement)
+    result_s2 = db_fetch(statement)[::-1]
+    print result_s2
 
     send_data = {"userid":args["userid"], "session_info":[]}
 
     for r in result_s1:
         cp = templates.get_session_info.copy()
+        print "session_id ", r[0]
         cp["session_id"],cp["date"],cp["start_timestamp"],cp["end_timestamp"],cp["duration"],\
-        cp["rating"],cp["rpe"],cp["ctl"],cp["atl"],cp["tsb"],cp["acwr"],cp["ewma"] = r[0],str(r[1]),str(r[3]),\
-        str(r[4]),r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]
-
-        while result_s2[-1][0] == r[0]:
+        cp["rpe"],cp["ctl"],cp["atl"],cp["tsb"],cp["acwr"],cp["ewma"] = r[0],str(r[1]),str(r[3]),\
+        str(r[4]),r[5],r[7],r[8],r[9],r[10],r[11],r[12]
+        
+        answers = [{"q_id":0,"val":r[6]}]
+        while result_s2 and result_s2[-1][0] == r[0]:
             ans = result_s2.pop()
-            cp["answers"].append({"qid":ans[1],"ans":ans[2]})
-
+            answers.append({"q_id":ans[1],"val":ans[2]})
+        cp["answers"] = answers
         send_data["session_info"].append(cp)
 
 
     return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
 
 
-## TODO: edit_session_info
+@application.route('/update_session_info', methods=['OPTIONS','POST'])
+def update_session_info():
+    log.info("/update_session_info")
+    pretty_print_POST(request)
+    response = json.loads(request.data)
+    session_id = response["session_id"]
+    answers = response["answers"]
+    start_ts,end_ts = response["start"],response["end"]
+    if not response["date"]:
+        date = str(datetime.datetime.now()).split(' ')[0]
+    else:
+        date = response["date"]
+    start_ts = ' '.join([date,start_ts])
+    end_ts = ' '.join([date,end_ts])
+    start = datetime.datetime.strptime(start_ts, '%Y-%m-%d %H:%M:%S')
+    end   = datetime.datetime.strptime(end_ts, '%Y-%m-%d %H:%M:%S')
+    duration = math.ceil(float((end-start).seconds/60.0))
+    for ans in answers:
+        if ans["q_id"] == "0":
+            rating = ans["val"]
+
+    statement = query.update_session_info1.format(start,end,duration,rating,session_id)
+    log.info("query: {}".format(statement))
+    ok_1 = db_insup(statement)
+
+    ok_2 = True
+    for ans in answers:
+        statement = query.update_session_info2.format(ans["val"],session_id,ans["q_id"])
+        log.info("query: {}".format(statement))
+        ok = db_insup(statement)
+        ok_2 = ok_2 and ok
+
+    return Response(json.dumps({"insert":ok_1 and ok_2}), headers=HEADER, status=200, mimetype='application/json')   
+
+
+@application.route('/get_session_id', methods=['GET'])
+def get_session_id():
+    log.info('/get_session_id')
+    args = request.args.to_dict()
+    statement = query.get_session_id.format(args["date"],args["userid"])
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+
+    return Response(json.dumps({"session_id":result[0][0],"userid":args["userid"]}), headers=HEADER, status=200, mimetype='application/json')
 
 
 if __name__ == '__main__':

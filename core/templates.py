@@ -67,12 +67,11 @@ get_session_info = {
     "start_timestamp":None,
     "end_timestamp": None,
     "duration": None,
-    "rating": None,
     "rpe": None,
     "ctl": None,
     "atl": None,
     "tsb": None,
     "acwr": None,
     "ewma": None,
-    "answers": []  
+    "answers": None  
 }
