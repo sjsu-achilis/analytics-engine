@@ -60,3 +60,19 @@ get_daily_health_data = {
     "minutes_of_intense_activity": None,
     "calories_activty": None
 }
+
+get_session_info = {
+    "session_id":None,
+    "date": None,
+    "start_timestamp":None,
+    "end_timestamp": None,
+    "duration": None,
+    "rating": None,
+    "rpe": None,
+    "ctl": None,
+    "atl": None,
+    "tsb": None,
+    "acwr": None,
+    "ewma": None,
+    "answers": []  
+}

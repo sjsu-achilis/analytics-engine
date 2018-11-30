@@ -26,3 +26,5 @@ __pycache__
 .pytest_cache
 *.csv
 *.out
+*.ipynb
+*.ipynb_checkpoints

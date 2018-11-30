@@ -560,7 +560,42 @@ def register_session_info():
     return Response(json.dumps({"insert":ok_1 and ok_2 and ok_3}), headers=HEADER, status=200, mimetype='application/json')   
 
 
-## TODO: write get_session_info_for_user and edit_session_info
+@application.route('/get_session_info', methods=['GET'])
+def get_session_info():
+    log.info('/get_session_info')
+    args = request.args.to_dict()
+    statement = query.get_session_info1.format(args["start_date"],args["end_date"],args["userid"])
+    log.info("query: {}".format(statement))
+    result_s1 = db_fetch(statement)
+
+    session_ids = []
+    for r in result_s1:
+        session_ids.append(r[0])
+    session_ids = tuple(session_ids)
+
+    statement = query.get_session_info2.format(session_ids)
+    log.info("query: {}".format(statement))
+    result_s2 = db_fetch(statement)
+
+    send_data = {"userid":args["userid"], "session_info":[]}
+
+    for r in result_s1:
+        cp = templates.get_session_info.copy()
+        cp["session_id"],cp["date"],cp["start_timestamp"],cp["end_timestamp"],cp["duration"],\
+        cp["rating"],cp["rpe"],cp["ctl"],cp["atl"],cp["tsb"],cp["acwr"],cp["ewma"] = r[0],str(r[1]),str(r[3]),\
+        str(r[4]),r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]
+
+        while result_s2[-1][0] == r[0]:
+            ans = result_s2.pop()
+            cp["answers"].append({"qid":ans[1],"ans":ans[2]})
+
+        send_data["session_info"].append(cp)
+
+
+    return Response(json.dumps(send_data), headers=HEADER, status=200, mimetype='application/json')
+
+
+## TODO: edit_session_info
 
 
 if __name__ == '__main__':

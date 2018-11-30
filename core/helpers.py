@@ -5,11 +5,12 @@ import csv
 import random
 import math
 import datetime
+import collections
 from datetime import timedelta, date
 
 from achlib.config import file_config
 from achlib.util import logger
-from achlib.util.dbutil import db_fetch, db_insup, generate_device_key
+from achlib.util.dbutil import db_fetch, db_insup, generate_device_key, generate_session_id
 
 config = file_config()
 log = logger.getLogger(__name__)
@@ -60,9 +61,53 @@ def daterange(date1, date2):
         ret.append((date1 + timedelta(n)).strftime("%Y-%m-%d"))
 
     return ret
+    
 
-def session_data_list(d,userid):
-    pass
+def session_data_list(start_dt,end_dt,userid,w_size):
+    dates = daterange(start_dt,end_dt)
+    up_list = []
+    lamb = float(2)/(w_size+1)
+    for i,d in enumerate(dates):
+        # on-season training data
+        rpe = 0
+        if 1<=int(d.split('-')[1])<=3:
+            duration,rating = random.randint(45,75),random.randint(2,5)
+            rpe = duration*rating
+        if 4<=int(d.split('-')[1])<=6:
+            duration,rating = random.randint(60,90),random.randint(5,7)
+            rpe = duration*rating
+        if 7<=int(d.split('-')[1])<=9:
+            duration,rating = random.randint(90,120),random.randint(8,10)
+            rpe = duration*rating
+        if 10<=int(d.split('-')[1])<=12:
+            duration,rating = random.randint(60,90),random.randint(4,6)
+            rpe = duration*rating
+
+        #calculate ctl
+        sum_ = rpe
+        for w in up_list[::-1][:20]:
+            sum_ += w[-1]
+        ctl = sum_/(len(up_list[::-1][0:20])+1)
+        # calculate atl
+        sum_ = rpe
+        for w in up_list[::-1][:6]:
+            sum_ += w[-1]
+        atl = sum_/(len(up_list[::-1][0:7])+1)
+        # calculate awcr
+        if ctl != 0:
+            acwr = atl/ctl
+        else:
+            acwr = 0
+        #calculate EWMA
+        if i==0:
+            ewma = acwr
+        else:
+            ewma = (rpe * lamb) + ((1-lamb)*up_list[-1][-1])
+
+        up_list.append([d,userid,None,None,duration,rating,rpe,ctl,atl,ctl-atl,acwr,ewma])
+
+
+    return up_list
 
 
 def insert_user_health_stats(userid=None, do_scale=False):
@@ -90,16 +135,38 @@ def insert_user_health_stats(userid=None, do_scale=False):
 
 def generate_session_data():
     users = ['2134225533','1342252213','1673662323','9978656676','1414252511']
-    f = open('session.csv','w+')
+    f = open('session_data.csv','w+')
     writer = csv.writer(f)
+    writer.writerow(['date','userid','start_timestamp','end_timestamp',\
+    'duration','rating','rpe','ctl','atl','tsb','acwr','ewma'])
     for user in users:
-        print user
         start_dt = date(2015, 5, 8)
     	end_dt = date(2016, 5, 7)
-        dates = daterange(start_dt,end_dt)
-        for d in dates:
-            writer.writerow(session_data_list(d,user))
+        for row in session_data_list(start_dt,end_dt,user,7):
+            writer.writerow(row)
+
+
+def insert_session_data():
+    f = open('session_data.csv', 'rb')
+    reader = csv.reader(f)
+    q = "insert into sessions values ({},'{}','{}',NULL,NULL,'{}','{}','{}','{}','{}','{}','{}','{}')"
+    for i,row in enumerate(reader):
+        if i==0:
+            continue
+        statement = q.format(generate_session_id(),row[0],row[1],row[4],row[5],row[6],row[7],row[8],row[9],\
+        row[10],row[11])
+        log.info("query: {}".format(statement))
+        ok = db_insup(statement)
+        log.info("row {}: {}".format(i,ok))
+
+def generate_session_answers():
+    f = open('session_answers.csv','w+')
+    writer = csv.writer(f)
+    for i in range(1830):
+        for j in range(6):
+            writer.writerow([i+1,j+1,random.randint(5,10)])
+        
 
 if __name__ == "__main__":
-    generate_session_data()
+    generate_session_answers()
 

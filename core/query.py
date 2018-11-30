@@ -84,4 +84,8 @@ register_session_info2 = "update sessions set rating = {} where id = {}"
 
 register_session_info3 = "insert into session_answers values ({},{},{})"
 
+get_session_info1 = "select * from sessions where date between '{}' and '{}' and userid = '{}'"
+
+get_session_info2 = "select * from session_answers where session_id in {}"
+
 
