@@ -8,6 +8,10 @@ import datetime
 import collections
 from datetime import timedelta, date
 
+import pandas as pd
+import numpy as np
+from statsmodels.tsa.arima_model import ARIMA
+
 from achlib.config import file_config
 from achlib.util import logger
 from achlib.util.dbutil import db_fetch, db_insup, generate_device_key, generate_session_id
@@ -165,8 +169,30 @@ def generate_session_answers():
     for i in range(1830):
         for j in range(6):
             writer.writerow([i+1,j+1,random.randint(5,10)])
-        
 
+
+def forecast(time_series):
+    ts = time_series
+    ts_log = np.log(ts) #taking logs
+    ts_log_diff = ts_log - ts_log.shift()
+    ts_log_diff.dropna(inplace=True)
+    ## arima model
+    model = ARIMA(ts_log, order=(2, 1, 2))  
+    results_ARIMA = model.fit(disp=-1)
+    log.info("RSS: {}".format(sum((results_ARIMA.fittedvalues-ts_log_diff)**2)))
+    predictions_ARIMA_diff = pd.Series(results_ARIMA.fittedvalues, copy=True)
+    predictions_ARIMA_diff_cumsum = predictions_ARIMA_diff.cumsum()
+    predictions_ARIMA_log = pd.Series(ts_log.ix[0], index=ts_log.index)
+    predictions_ARIMA_log = predictions_ARIMA_log.add(predictions_ARIMA_diff_cumsum,fill_value=0)
+    predictions_ARIMA = np.exp(predictions_ARIMA_log)
+    log.info("RMSE: {}".format(np.sqrt(sum((predictions_ARIMA-ts)**2)/len(ts))))
+    forecast = []
+    for p in predictions_ARIMA.values[:21]:
+        forecast.append(p*random.uniform(0.8,1.2))
+
+    return forecast
+
+    
 if __name__ == "__main__":
-    generate_session_answers()
+    pass
 

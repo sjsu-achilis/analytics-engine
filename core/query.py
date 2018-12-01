@@ -94,3 +94,5 @@ where id={}"
 update_session_info2 = "update session_answers set response='{}' where session_id='{}' and qid='{}'"
 
 get_session_id = "select id from sessions where date='{}' and userid='{}'"
+
+get_forecast = "select date,acwr from sessions where userid = '{}' and date < '{}' order by date desc limit 365"

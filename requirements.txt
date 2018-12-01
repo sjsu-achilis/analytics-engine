@@ -7,7 +7,10 @@ Jinja2==2.10
 MarkupSafe==1.0
 psycopg2==2.7.5
 Werkzeug==0.14.1
-requests
-pprint
-flask_cors
-firebase_admin
+requests==2.20.1
+pprint==0.1
+flask_cors==3.0.7
+firebase_admin==2.13.0
+statsmodels==0.9.0
+numpy==1.15.4
+pandas==0.23.4

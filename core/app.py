@@ -10,13 +10,14 @@ from flask import Flask, request, Response
 from flask_cors import CORS
 import pprint
 import json
+import pandas as pd
 
 import query
 import templates
 from achlib.config import file_config
 from achlib.util import logger
 from achlib.util.dbutil import db_fetch, db_insup, generate_device_key, generate_session_id
-from helpers import pretty_print_POST, get_user_details
+from helpers import pretty_print_POST, get_user_details, forecast
 
 config = file_config()
 log = logger.getLogger(__name__)
@@ -642,6 +643,24 @@ def get_session_id():
     result = db_fetch(statement)
 
     return Response(json.dumps({"session_id":result[0][0],"userid":args["userid"]}), headers=HEADER, status=200, mimetype='application/json')
+
+
+@application.route('/get_forecast', methods=['GET'])
+def get_forecast():
+    log.info('/get_forecast')
+    args = request.args.to_dict()
+    statement = query.get_forecast.format(args["userid"],args["start_date"])
+    log.info("query: {}".format(statement))
+    result = db_fetch(statement)
+    data, index = [], []
+    for r in result[::-1]:
+        data.append(r[1])
+        index.append(str(r[0]))
+    df = pd.DataFrame(data=data,index=index,columns=['acwr'])
+    forecasted = forecast(df['acwr'])
+
+    return Response(json.dumps({"forecast":forecasted}), headers=HEADER, status=200, mimetype='application/json')
+
 
 
 if __name__ == '__main__':
