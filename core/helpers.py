@@ -150,6 +150,7 @@ def generate_session_data():
             writer.writerow(row)
 
 
+
 def insert_session_data():
     f = open('session_data.csv', 'rb')
     reader = csv.reader(f)

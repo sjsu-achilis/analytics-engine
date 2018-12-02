@@ -29,6 +29,7 @@
 *.out
 *.ipynb
 *.ipynb_checkpoints
+*.png
 
 # OS generated files #
 ######################
