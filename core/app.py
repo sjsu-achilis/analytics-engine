@@ -356,7 +356,6 @@ def get_event():
     statement = query.get_event.format(args)
     log.info("query: {}".format(statement))
     result = db_fetch(statement)
-    print result
     send_data = []
     for res in result:
         event_data = templates.get_event.copy()
@@ -502,7 +501,6 @@ def add_day_data():
         log.info("query: {}".format(statement))
         result = db_fetch(statement)
         new_val = float(response["value"])
-        print result
         if result[0][0]:
             new_val += float(result[0][0])
         log.info("updating value")
@@ -577,13 +575,10 @@ def get_session_info():
     statement = query.get_session_info2.format(session_ids)
     log.info("query: {}".format(statement))
     result_s2 = db_fetch(statement)[::-1]
-    print result_s2
-
     send_data = {"userid":args["userid"], "session_info":[]}
 
     for r in result_s1:
         cp = templates.get_session_info.copy()
-        print "session_id ", r[0]
         cp["session_id"],cp["date"],cp["start_timestamp"],cp["end_timestamp"],cp["duration"],\
         cp["rpe"],cp["ctl"],cp["atl"],cp["tsb"],cp["acwr"],cp["ewma"] = r[0],str(r[1]),str(r[3]),\
         str(r[4]),r[5],r[7],r[8],r[9],r[10],r[11],r[12]
