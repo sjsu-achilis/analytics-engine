@@ -652,7 +652,11 @@ def get_forecast():
         data.append(r[1])
         index.append(str(r[0]))
     df = pd.DataFrame(data=data,index=index,columns=['acwr'])
-    forecasted = forecast(df['acwr'])
+    try:
+        forecasted = forecast(df['acwr'])
+    except Exception as e:
+        forecasted = e.message
+        log.error(e)
 
     return Response(json.dumps({"forecast":forecasted}), headers=HEADER, status=200, mimetype='application/json')
 
